@@ -1,0 +1,8 @@
+
+- Generic 8-bit SMS class which auto-sends concatenated SMS for large content.
+- SMS user data header.
+- Operator logo encoding/decoding.
+- Ringtone encoding/decoding.
+- MMS content encoding/decoding.
+
+- self._http_* code is very stupidly arranged. Fix it.

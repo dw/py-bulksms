@@ -1,0 +1,510 @@
+<html>
+
+<head>
+<title>BulkSMS.co.uk Python Implementation</title>
+<link rel="stylesheet" href="docs.css" />
+</head>
+
+
+<body>
+
+
+<div id="frontal">
+
+<h1>BulkSMS.co.uk Python Implementation</h1>
+
+<p>
+<strong>Release 0.2</strong><br />
+29th October, 2003
+</p>
+
+<p>
+<strong>&copy; 2003 David M. Wilson
+&lt;<a href="mailto:dw-BulkSMS@botanicus.net">dw-BulkSMS@botanicus.net</a>&gt;
+</strong>
+</p>
+
+<p>
+All rights reserved except those specifically granted under the accompanying
+license. Please see the file <code>LICENSE</code> from the source distribution.
+</p>
+
+</div>
+
+
+
+
+<h2>Contents</h2>
+
+<ol>
+<li><a href="#what">What is 'BulkSMS'?</a></li>
+<li><a href="#module">How do I use the Python module?</a></li>
+<li><a href="#cli">How do I use the command-line interface?</a></li>
+<li><a href="#changes">Changes between versions.</a></li>
+</ol>
+
+
+
+
+<a name="what"></a>
+<h2>What is 'BulkSMS'?</h2>
+
+
+<div class="section">
+
+	<h3>BulkSMS.co.uk</h3>
+
+	<p>
+	BulkSMS.co.uk is a commercial SMS transit provider allowing programmatic
+	transmission of SMS through an HTTP RPC API. The service provides facilities
+	for sending 7-bit, 8-bit, and Unicode-encoded SMS messages, alongside
+	reporting and account control functions.
+	</p>
+
+	<p>
+	More information on BulkSMS.co.uk can be found at
+	<a href="http://www.bulksms.co.uk/">http://www.bulksms.co.uk/</a>.
+	</p>
+
+
+	<h3>BulkSMS Python Module</h3>
+
+	<p>
+	The BulkSMS Python Module is an object-based implementation of a
+	BulkSMS.co.uk API client designed for Python 2.3. It has been designed for
+	use with version 1.0 of the BulkSMS.co.uk API.
+	</p>
+	
+	<p>
+	More information on Python can be found at
+	<a href="http://www.python.org/">http://www.python.org/</a>.
+	</p>
+
+
+	<h3>BulkSMS Command Line Interface</h3>
+
+	<p>
+	The BulkSMS Command Line Interface is a small program written around the
+	BulkSMS Python module, giving the user an easy interface for sending SMS
+	messages using any command line from which Python may be run.
+	</p>
+
+</div>
+
+
+
+
+<a name="module"></a>
+<h2>How do I use the Python module?</h2>
+
+
+<div class="section">
+
+	<h3>Module API Reference</h3>
+
+	<p>
+	Like all Python code, the module is self-documenting. Documentation for the
+	module can be extracted into an HTML file using the the standard
+	<code>pydoc</code> utility that is distributed with modern versions of
+	Python. Alternatively, you may use the <code>help()</code> built-in to
+	explore the module interactively:
+	</p>
+
+	<kbd>
+		&gt; import BulkSMS<br />
+		&gt; help(BulkSMS.format_credits)<br />
+		...
+	</kbd>
+
+
+
+	<h3>General Overview</h3>
+
+	<p>
+	The module defines a <code>BulkSMS</code> class through which the client
+	program performs all its operations. The class defines 5 methods for
+	sending, reporting, polling, quoting, and checking your account balance.
+	These methods are <code>send_sms()</code>, <code>get_report()</code>,
+	<code>poll_report()</codE>, <code>quote_sms()</code>, and
+	<code>get_credits()</code> respectively. Their interfaces are discussed at
+	greater length in the generated documentation.
+	</p>
+
+	<p>
+	Error reporting is handled using the standard Python exceptions mechanism.
+	10 exceptions are defined, all derived from a single base
+	<code>BulkSMSException</code> exception for simple exception filtering.
+	Although each exception contains it's own error-specific values, calling
+	<code>str()</code> on an instance of one of these exceptions is sufficient
+	to create an error message suitable for a human.
+	</p>
+
+	<p>
+	A single helper function is provided, <code>format_credits()</code>, which
+	simply returns a string representation of the given floating point number.
+	The string representation is formatted as the credit read-out is formatted
+	in the BulkSMS.co.uk member area.
+	</p>
+
+
+
+	<h3>A Simple Example</h3>
+
+	<p>
+	In order to utilise the BulkSMS class, you must first instanciate it. You
+	do this by calling a constructor, passing your BulkSMS username and password
+	in the process:
+	</p>
+
+	<kbd>
+		&gt; s = BulkSMS.BulkSMS('username', 'password')<br />
+	</kbd>
+
+	<p>
+	A new instance has now been created. First, let's query our account to see
+	how many credits we have:
+	</p>
+
+	<kbd>
+		&gt; credits = s.get_credits()<br />
+		&gt; print 'Credits:', BulkSMS.format_credits(credits)<br />
+		Credits: 392.95
+	</kbd>
+
+	<p>
+	Okay, so we have plenty of credit available on our account. Now we would
+	like to send a message to ourselves. We want our message to appear to have
+	originated from <code>Mail Software</code>, and to include a count of all
+	the messages in our inbox. The module <code>EmailBox</code> used below is
+	hypothetical:
+	</p>
+
+	<kbd>
+		&gt; import EmailBox<br />
+		&gt; inbox = EmailBox.Inbox()<br />
+		&gt;<br />
+		&gt; to = [ '447967123123' ]<br />
+		&gt; from = 'Mail Software'<br />
+		&gt; msg = 'You have %d new messages.' % len(inbox)<br />
+		&gt;<br />
+		&gt; msg_id = s.send_sms(to, msg, sender = from)<br />
+		&gt; print msg_id<br />
+		7738925
+	</kbd>
+
+
+	<p>
+	Now we would like to find out if our message has been delivered to our phone
+	yet. To do so, we make use of the <code>get_report()</code> method.
+	<code>get_report()</code> returns a list of 3-tuples, one for each recipient
+	we specified in <code>to</code>. Since we only sent a message to ourselves,
+	the return value of <code>get_report()</code> in this instance is a list of
+	one 3-tuple:
+	</p>
+
+	<kbd>
+		&gt; report = s.get_report(msg_id)<br />
+		&gt; report<br />
+		[('447967123123', 10, 'Delivered upstream')]
+	</kbd>
+
+	<p>
+	As you can clearly see, the SMS is en-route to the destination number. The
+	second item in the 3-tuple is the BulkSMS status code. It may be used for
+	safely testing whether a message has reached it's destination:
+	</p>
+
+	<kbd>
+		&gt; for number, code, desc in report:<br />
+		&gt;<br />
+		&gt; &nbsp; if code == 11:<br />
+		&gt; &nbsp; &nbsp; print recipient, 'got the message.'<br />
+		&gt;<br />
+		&gt; &nbsp; else:<br />
+		&gt; &nbsp; &nbsp; print '%s: %s.' % (number, desc)<br />
+		&gt;<br />
+		447967123123: Delivered upstream.
+	</kbd>
+
+
+	<p>
+	Time for a little risk assessment. Depending on what route you use, certain
+	recipients may cost more to deliver to than others. Let's find out how much
+	an SMS would cost using BulkSMS's best routes.
+	</p>
+
+	<p>
+	We can specify the route in one of two ways, either when calling
+	<code>send_sms()</code> or <code>quote_sms()</code> by passing them the
+	<code>cost_route</code> named parameter, or by setting the
+	<code>cost_route</code> instance variable. Here we set the instance
+	variable:
+	</p>
+
+	<kbd>
+		&gt; s.cost_route = 3<br />
+		&gt; to = [ '447967123123', '447967321321' ]<br />
+		&gt;<br />
+		&gt; s<br />
+		BulkSMS('username', 'password', cost_route=3)<br />
+		&gt; s.quote_sms(to, msg, sender = from)<br />
+		3.0<br />
+	</kbd>
+
+
+	<p>
+	One convenience method is available to the user; <code>poll_report()</code>
+	sits in a loop, calling <code>get_report()</code> at specified intervals
+	until all recipients have received their message, or until a specified
+	timeout is reached.
+	</p>
+
+	<p>
+	Every time the status of the message changes, <code>poll_report()</code>
+	will pass the result of <code>get_report()</code> to a specified function.
+	This is used in the CLI to implement the <code>poll</code> option. Here is
+	how it works:
+	</p>
+
+	<kbd>
+		&gt; def realtime_redeliver(report):<br />
+		&gt; &nbsp; failed_deliveries = filter_failures(report)<br />
+		&gt; &nbsp; schedule_retransmissions(failed_deliveries)<br />
+		&gt; &nbsp; print 'Scheduled', len(failed_deliveries), 'new messages.'<br />
+		&gt;<br />
+		&gt; s.poll_report(msg_id, realtime_redeliver, poll_time = 300)<br />
+		Scheduled 3 new messages.<br />
+		Scheduled 1 new messages.<br />
+		Scheduled 0 new messages.
+	</kbd>
+
+
+	<p>
+	The above code might be used to ensure that an SMS is delivered by tracking
+	it's status in near-real time, and scheduling redeliveries for messages that
+	failed to arrive at a telephone.
+	</p>
+
+	<h3>Notes</h3>
+
+	<p>
+	It is worth note that the <code>send_sms()</code> and
+	<code>quote_sms()</code> methods take exactly the same parameters. If you
+	are testing your code, you may swap calls to <code>send_sms()</code> with
+	calls to <code>quote_sms()</code>. Any errors that would occur when using
+	<code>send_sms()</code> will still be caught and returned as exceptions,
+	and it uses no credits.
+	</p>
+
+	<p>
+	You may also use this to save on keystrokes. For example:
+	</p>
+
+	<kbd>
+		&gt; def send_if_affordable(server, *pargs, **nargs):<br />
+		&gt; &nbsp; cost = server.quote_sms(*pargs, **nargs)<br />
+		&gt;<br />
+		&gt; &nbsp; if is_affordable(cost):<br />
+		&gt; &nbsp; &nbsp; return server.send_sms(*pargs, **nargs)<br />
+		&gt;<br/ >
+		&gt; &nbsp; else:<br />
+		&gt; &nbsp; &nbsp; raise CheapSkateError("it costs too much!")
+	</kbd>
+
+
+	<p>
+	The <code>BulkSMS</code> class will return valid Python syntax for
+	recreating itself if <code>repr()</code> is involked on it. This is useful
+	for testing and debugging, but it does expose your password.
+	</p>
+
+	<p>
+	For this reason, a <code>secure_repr</code> instance variable exists, which
+	will cause the class to return a safe representation of itself. It is
+	recommended that you set <code>secure_repr = True</code> in production
+	environments, where a string representation of the server object may leak
+	out, for example, in a CGI backtrace.
+	</p>
+
+	<kbd>
+		&gt; s<br />
+		BulkSMS('username', 'password')<br />
+		&gt; s.sender = 'Default Sender'<br />
+		&gt; s<br />
+		BulkSMS('username', 'password', sender='Default Sender')<br />
+		&gt; s.secure_repr = True<br />
+		&lt;instance of BulkSMS.BulkSMS with id 1078290636&gt;
+	</kbd>
+
+
+
+	<p>
+	Recipient numbers at BulkSMS take the form <code>CCNNNN</code>, where
+	<code>CC</code> is the 2 or 3-digit country code (without a zero prefix),
+	and <code>NNNN</code> is the variable-length recipient number. Each number
+	may be up to 14 digits in length.
+	</p>
+
+	<p>
+	The BulkSMS <code>sender</code> field may be up to a 14 digit number, as
+	above, or an 11 character string. Further restrictions apply, please see the
+	BulkSMS API reference.
+	</p>
+
+</div>
+
+
+
+
+<a name="cli"></a>
+<h2>How do I use the command-line interface?</h2>
+
+
+<div class="section">
+	<p>
+	Designed with the power user in mind, the BulkSMS command line interface
+	provides a simple, reliable method of sending SMS messages from your
+	workstation, at the command-line, inside scripts, or from calls by other
+	applications.
+	</p>
+
+	<p>
+	No configuration of the command is required, however there are 3 environment
+	variables which affect the command's operation.
+	<code>BULKSMS_USERNAME</code>, <code>BULKSMS_PASSWORD</code>, and
+	<code>BULKSMS_SENDER</code> may be set from your login profile to speed up
+	the use of the command. By setting these variables, you no longer have to
+	provide your username, password, and mobile telephone number each time you
+	call the command.
+	</p>
+
+	<p>
+	Just like the Python API it wraps, the <code>sms</code> command also has 5
+	methods:
+	</p>
+
+	<kbd>
+		sms send&nbsp; &nbsp; [<em>options</em>] "<em>Message here.</em>"
+		<em>recipient1 recipient2 recipient...</em><br />
+
+		sms quote&nbsp;&nbsp; [<em>options</em>] "<em>Message here.</em>"
+		<em>recipient1 recipient2 recipient...</em><br />
+
+		sms report&nbsp; [<em>options</em>] <em>msg_id</em> [<em>recipient</em>]<br />
+
+		sms poll&nbsp; &nbsp; [<em>options</em>] <em>msg_id</em> [<em>recipient</em>]<br />
+		sms credits [<em>options</em>]
+	</kbd>
+
+	<p>
+	I will not spend any more time going over the interface; it is too simple.
+	Type <code>sms</code> at a command line to see the help page. It has all you
+	need to know.
+	</p>
+
+
+
+	<h3>Configuring Your Address Book</h3>
+
+	<p>
+	The command-line interface supports a very simple keyword-based phone book
+	stored in your user profile or home directory. At startup, it searches for a
+	<code>.sms_phonebook</code> file in the directories specified by the
+	<code>HOME</code> and <code>USERPROFILE</code> environment variables.
+	</p>
+
+	<p>
+	If such a file is not found, an empty one is created. The format of the file
+	is simple: one line per record, one or more recipients per keyword,
+	specified in the following format:
+	</p>
+
+	<kbd>
+		<em>keyword1: recipient1, recipient2</em><br />
+		<em>keyword2: recipient1</em><br />
+		<em>keyword3: recipient1, recipient2, recipient3</em>
+	</kbd>
+
+	<p>
+	And so on. Once you have populated this file, you may use a keyword from the
+	file in place of a recipient number, or a list of recipient numbers. Here is
+	an example:
+	</p>
+
+	<kbd>
+		dw: 447967123123<br />
+		boss: 447967321321<br />
+		dw+boss: 447967123123, 447967321321<br />
+		friend1: 447900111222<br />
+		friend2: 447910113222<br />
+		friends: 447900111222, 447900113222
+	</kbd>
+
+	<p>
+	With this phone book, you may use a command such as this:
+	</p>
+
+	<kbd>
+		$ sms send 'Hello myself, my boss, and my friends!' dw boss friends<br />
+		Message sent. Message ID: 7738925<br />
+		<br />
+		$ sms report 7738925<br />
+		447967123123 &nbsp; 10 Delivered upstream<br />
+		447967321321 &nbsp; 10 Delivered upstream<br />
+		447900111222 &nbsp; 11 Delivered to mobile<br />
+		447900113222 &nbsp; 10 Delivered upstream
+	</kbd>
+</div>
+
+
+
+
+
+<a name="changes"></a>
+<h2>Changes between versions.</h2>
+
+
+<div class="section">
+	<h3>February 6, 2004.</h3>
+
+	<ul>
+	<li>Added support for sending 2-way SMSes in the CLI via
+		<code>--repliable</code> and in API via a <code>repliable</code>
+		attribute.
+		</li>
+
+	<li>Added support for reading your the 2-way SMS inbox using a BulkSMS Inbox
+		proxy.
+		</li>
+
+	<li>Added Inbox Server protocol documentation.</li>
+
+	</ul>
+
+
+	<h3>October 29, 2003.</h3>
+
+	<ul>
+	<li>Added a new <code>poll_report()</code> method to the
+		<code>BulkSMS</code> class. Added <code>poll_time</code> and
+		<code>poll_wait</code> instance variables to control
+		<code>poll_report()</code>. Modified the <code>CLI</code> module to
+		utilise <code>poll_report()</code>.
+		</li>
+
+	<li>Fixed several inconsistancies and typing mistakes in the inline
+		documentation as well as <code>README.html</code>. Added new paragraphs
+		and examples for <code>poll_report()</code>.</li>
+	</ul>
+
+
+	<h3>0.1: October 14, 2003.</h3>
+
+	<ul>
+	<li>Initial version.</li>
+	</ul>
+
+</div>
+
+</body>
+</html>

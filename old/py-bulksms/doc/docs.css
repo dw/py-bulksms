@@ -1,0 +1,41 @@
+h1 { font-size: 1.3em; text-decoration: underline; }
+h2 { font-size: 1.1em; text-decoration: underline; }
+h3 { font-size: 1.0em; text-decoration: underline; font-weight: bold; }
+h4 { font-size: 1.0em; text-decoration: none; color: green; }
+
+h2 { margin-top: 3.5em; }
+h3 { margin-top: 2.5em; }
+
+code { color: #7f0000; }
+code:before { content: open-quote; }
+code:after  { content: close-quote; }
+
+kbd {
+	display: block;
+	margin: 1em 1em 2.5em 1em;
+	padding: 1ex;
+	background: #eaeaea;
+	color: #007f00;
+}
+
+div#frontal {
+	text-align: center;
+	margin: 6em auto;
+	width: 50%;
+}
+
+div.section {
+	margin: 1em 3em;
+}
+
+ul li {
+	margin-bottom: 1em;
+}
+
+thead tr, thead th {
+	background-color: #efffef;
+}
+
+td, th {
+	text-align: left;
+}

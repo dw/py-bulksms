@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+"""
+sms: User interface to BulkSMS.CLI.
+Author: David M. Wilson <dw-sms@botanicus.net>.
+"""
+
+import BulkSMS, BulkSMS.CLI
+import sys, os, getopt
+
+
+
+progname = os.path.basename(sys.argv[0])
+
+try:
+	sys.exit(BulkSMS.CLI.command_line(sys.argv))
+
+except BulkSMS.BulkSMSException, error:
+	print >> sys.stderr, "BulkSMS.co.uk error:", str(error)
+
+except IOError, error:
+	print >> sys.stderr, "%s: %s: %s" %\
+		( progname, error.filename, error.strerror )
+
+except getopt.GetoptError, error:
+	print >> sys.stderr, "%s: %s" %\
+		( progname, error.msg )
+
+	BulkSMS.CLI.usage(progname)
+
+
+sys.exit(1)

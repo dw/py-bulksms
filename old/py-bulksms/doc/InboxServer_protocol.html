@@ -1,0 +1,246 @@
+<html>
+
+<head>
+<title>BulkSMS.co.uk Python Implementation - Inbox Server Protocol</title>
+<link rel="stylesheet" href="docs.css" />
+</head>
+
+
+<body>
+
+
+<div id="frontal">
+
+<h1>BulkSMS.co.uk Python Implementation</h1>
+
+<h2>Inbox Server Protocol</h2>
+
+<p>
+<strong>Release 1.0</strong><br />
+7th February, 2004
+</p>
+
+<p>
+<strong>&copy; 2004 David M. Wilson
+&lt;<a href="mailto:dw-BulkSMS@botanicus.net">dw-BulkSMS@botanicus.net</a>&gt;
+</strong>
+</p>
+
+<p>
+All rights reserved except those specifically granted under the accompanying
+license. Please see the file <code>LICENSE</code> from the source distribution.
+</p>
+
+</div>
+
+
+
+
+<h2>Contents</h2>
+
+<ol>
+<li><a href="#intro">Introduction.</a></li>
+<li><a href="#http">Making HTTP requests.</a></li>
+<li><a href="#create-session">Creating a TCP session.</a></li>
+<li><a href="#response-codes">Response codes.</a></li>
+<li><a href="#notes">Notes.</a></li>
+</ol>
+
+
+
+
+
+
+<a name="intro"></a>
+<h2>Introduction.</h2>
+
+<div class="section">
+	<p>
+	In order to allow more dynamic use of the 2-way SMS facility, an Inbox
+	Server can be utilised to accept incoming SMS replies and forward them to a
+	client. Through the use of an Inbox Server, a BulkSMS API client can have
+	true 2-way capability regardless of where it is presently located on the
+	Internet.
+	</p>
+
+	<p>
+	The protocol described below is a very simple ASCII-based serial
+	request-response protocol, with no major data structures except the use of
+	<em>URL Encoding</em> to escape control sequences such as field seperators
+	and newlines.
+	</p>
+
+	<p>
+	More information on how to encode URLs in the standard format can be found
+	<a href="http://www.google.com/">on Google</a>.
+	</p>
+
+
+	<h3>Communication modes - TCP session / HTTP sessionless.</h3>
+
+	<p>
+	The protocol may work in two modes, one acting as a fallback for the other.
+	Initially communication with the server is executed over HTTP, however if
+	desired a request may be made to create a TCP-based session with the server,
+	so that replies and notifications may be passed back to the client quickly,
+	and without polling.
+	</p>
+
+	<p>
+	All the protocol's functionality is available in either mode - this means
+	that if you are writing a portable client, it can first attempt to create a
+	raw TCP connection, and if that fails, continue talking to the server via
+	HTTP.
+	</p>
+</div>
+
+
+
+
+<a name="http"></a>
+<h2>Making HTTP requests.</h2>
+
+<div class="section">
+	<p>
+	To communicate with a server, simply build an HTTP POST request containing
+	valid <code>username</code> and <code>password</code> fields, a
+	<code>request</code> field containing a valid request method, and any fields
+	required by the request.
+	</p>
+
+
+	<h3>Responses.</h3>
+
+	<p>
+	The protocol's server response format is as close to BulkSMS.co.uk's own
+	reply format as possible. A response is made up of multiple rows (lines),
+	each containing a number of fields seperated by a pipe character.
+	</p>
+
+	<p>
+	The 'status row' referred to below is simply the first row returned by the
+	server. It will contain at least two fields, a response code and a response
+	description. See below for all the valid response codes. The server always
+	returns a status row.
+	</p>
+
+	<p>
+	The status row may also contain a third field, the purpose of which is
+	defined by the active request. This will usually indicate the length of the
+	rest of the request response, or a similar measurement.
+	</p>
+</div>
+
+
+
+
+<h2>Creating a TCP session.</h2>
+
+<div class="section">
+	<p>
+	To create a TCP session, make an HTTP request with the <code>request</code>
+	field set to <code>create-tcp-session</code>. Any previous session using
+	the given username and password will be terminated.
+	</p>
+
+	<p>
+	You may optionally specify a <code>session_ip</code> field, which may be an
+	IP address in dotted quad form, optionally suffixed with a colon character
+	and a port number.
+	</p>
+
+	<p>
+	Setting the <code>session_ip</code> field to something other than
+	<code>0.0.0.0</code> requests that the server allow a session from the given
+	IP address. If the field is set to <code>0.0.0.0</code>, request that the
+	server allow the session from any IP address.
+	</p>
+	
+	<p>
+	If a port number was specified, request that the server allow an incoming
+	session from only that remote port. This can be used on multi-user systems
+	(eg. shell accounts) to guarantee session security, by binding a local port
+	and connect()ing from it.
+	</p>
+
+
+
+	<h3>Success</h3>
+
+	<p>
+	On success the server will return a response code of 101, followed by a row with 3
+	fields. The first field is a session cookie, save it, you will need it to
+	authenticate. The second and third fields are an IP address in dotted quad
+	format and a port number respectively.
+	</p>
+
+	<p>
+	You may now open a TCP connection to the address and port specified by the
+	server. To authenticate, send the session cookie followed by a newline
+	character.
+	</p>
+
+	<p>
+	The server will always return a response code of 102, and the connection is
+	now ready for 2-way communication.
+	</p>
+
+
+	<h3>Failure</h3>
+
+	<p>
+	On failure, the server will return a response code of 23 or 103, and no TCP
+	connection information will be sent.
+	</p>
+
+	<p>
+	If the HTTP request was successful, but the session setup request was not,
+	the response code will be one of 103 or 104. An authentication failure may
+	be caused by your TCP connection coming from a different IP address than
+	your HTTP request. This is common when an HTTP proxy is in use. If this
+	occurs, you may be able to use the <code>session_ip</code> field of the
+	<code>create-tcp-session</code> request.
+	</p>
+</div>
+
+
+
+
+<a name="response-codes"></a>
+<h2>Response codes.</h2>
+
+<div class="section">
+	<table>
+	<thead>
+	<tr>
+	<th>Code</th>
+	<th>Meaning</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr> <td>23</td> <td>Authentication failure</td> </tr>
+	<tr> <td>24</td> <td>Data validation failed</td> </tr>
+	<tbody> <td>101</td> <td>Session information follows</td> </tr>
+	<tbody> <td>102</td> <td>Session established</td> </tr>
+	<tbody> <td>103</td> <td>Service unavailable</td> </tr>
+	<tbody> <td>104</td> <td>Session authentication failure</td> </tr>
+	</tbody>
+	</table>
+</div>
+
+
+
+<a name="notes"></a>
+<h2>Notes.</h2>
+
+
+	<ul>
+	<li>All communication to the server is authenticated with a username and
+		password pair. This allows for the easy future addition of sub-inboxes
+		without changing the client, should such a feature be desired.</li>
+	</ul>
+</div>
+
+
+</body>
+</html>
