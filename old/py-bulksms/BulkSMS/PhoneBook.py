@@ -64,7 +64,15 @@ class HomedirPhoneBook(BasePhoneBook):
 
 
     def lookup_keyword(self, keyword):
-        if keyword in self.phonebook:
-            return self.phonebook[keyword]
+        numbers = []
+
+        if keyword not in self.phonebook:
+            numbers.append(keyword)
         else:
-            return []
+            for keyword2 in self.phonebook[keyword]:
+                if keyword2 in self.phonebook:
+                    numbers.extend(self.phonebook[keyword2])
+                else:
+                    numbers.append(keyword2)
+
+        return numbers
