@@ -1,3 +1,7 @@
+
+# py-BulkSMS GNU Make wrapper.
+# $Id$
+
 VERSION=0.1
 LOCAL_PATH=/usr/local/BulkSMS-$(VERSION)
 
