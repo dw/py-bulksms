@@ -1,0 +1,52 @@
+Goals for the 'py-sms' project.
+$Id$
+
+
+
+Overall Goals
+
+    Here we define the overall properties of the project.
+
+    Goal                                                                Status
+    --------------------------------------------------------------------------
+    Pick a project name.                                                0%
+    Define scope and core functionality.                                1%
+    Choose a distribution license.                                      0%
+    Define documentation formats and layout.                            0%
+    Create project structures (lists, repos, www)                       1%
+    Loosely agree on some coding standards (variables, indent, etc)
+        Unicode implementation.                                         0%
+        Image handling implementation.                                  0%
+
+
+
+Functional Goals
+
+    Here we describe the aims (the 'product') of the project. The following are
+    entirely speculative and dependant on the currently non-existing definition
+    of the project goals.
+
+    Goal                                                                Status
+    --------------------------------------------------------------------------
+    Draft design of package structure / standard module format.         0%
+    Design and document a standard gateway adaptor interface.           0%
+    Design and document a method for handling 2-way SMS.                0%
+    Capability detection                                                0%
+    Least cost routing between configured gateways.                     0%
+    Implement shared functionality
+        Concatenated SMS support.                                       0%
+        Operator logos (use PIL?)                                       0%
+        Asynchronous/synchronous sockets, HTTP, and SMPP.               0%
+        2-way SMS framework.                                            0%
+    Implement a BulkSMS adaptor.                                        0%
+    Implement a Clickatell.com adaptor (SMPP? HTTP?)                    0%
+    Implement an AspSMS.com adaptor.                                    0%
+    Implement a gnokii adaptor?                                         0%
+    Implement an smsclient adaptor?                                     0%
+        [this allows Python access to these tools, and also
+         least-cost routing support for them too.]
+    Implement useful userspace tools.
+        Command-line SMS client.                                        0%
+        Background SMS submission daemon.                               0%
+
+vim: et ts=4 tw=79
