@@ -12,9 +12,9 @@ __version__ = '0.3'
 # Was CoreBulkSMS really such a good idea?
 
 from CoreBulkSMS import \
-	BulkSMSException, MessageLengthException, AuthenticationException, \
-	DataValidationException, InsufficientCreditsException, \
-	DuplicateMessageException, QuotaException, MessageNotFoundException, \
-	InternalFatalError, UnknownException, CommunicationException, \
-	\
-	format_credits, BulkSMS
+    BulkSMSException, MessageLengthException, AuthenticationException, \
+    DataValidationException, InsufficientCreditsException, \
+    DuplicateMessageException, QuotaException, MessageNotFoundException, \
+    InternalFatalError, UnknownException, CommunicationException, \
+    \
+    format_credits, BulkSMS

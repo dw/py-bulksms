@@ -13,20 +13,20 @@ import sys, os, getopt
 progname = os.path.basename(sys.argv[0])
 
 try:
-	sys.exit(BulkSMS.CLI.command_line(sys.argv))
+    sys.exit(BulkSMS.CLI.command_line(sys.argv))
 
 except BulkSMS.BulkSMSException, error:
-	print >> sys.stderr, "BulkSMS.co.uk error:", str(error)
+    print >> sys.stderr, "BulkSMS.co.uk error:", str(error)
 
 except IOError, error:
-	print >> sys.stderr, "%s: %s: %s" %\
-		( progname, error.filename, error.strerror )
+    print >> sys.stderr, "%s: %s: %s" %\
+        ( progname, error.filename, error.strerror )
 
 except getopt.GetoptError, error:
-	print >> sys.stderr, "%s: %s" %\
-		( progname, error.msg )
+    print >> sys.stderr, "%s: %s" %\
+        ( progname, error.msg )
 
-	BulkSMS.CLI.usage(progname)
+    BulkSMS.CLI.usage(progname)
 
 
 sys.exit(1)
