@@ -52,7 +52,7 @@ class HomedirPhoneBook(BasePhoneBook):
 
         pathname = os.path.join(homedir, '.sms_phonebook')
 
-        for line in open(pathname, "a+"):
+        for line in file(pathname, "r+"):
             keyword, numbers_text = line.split(": ")
             self.phonebook[keyword] = numbers_text.strip().split(", ")
 
