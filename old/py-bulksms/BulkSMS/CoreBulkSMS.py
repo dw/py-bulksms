@@ -5,7 +5,7 @@ BulkSMS/CoreBulkSMS.py: Core BulkSMS package functionality.
 __author__ = 'David M. Wilson <dw-CoreBulkSMS.py@botanicus.net>'
 __version__ = '0.1'
 
-import urllib, urllib2, time, PhoneBook
+import urllib, urllib2, time, PhoneBook, datetime
 
 
 
@@ -186,6 +186,47 @@ def format_credits(credits):
 
 
 
+class InboxMessage:
+    '''
+    This class represents a single inbox message.
+    '''
+
+    def from_response(cls, response):
+        '''
+        Instanciate a new InboxMessage instance from a single BulkSMS response
+        line as returned by the get_inbox EAPI call.
+        '''
+
+        parts = response.split('|')
+        self = cls()
+
+        if len(parts) != 6:
+            raise CommunicationException(\
+                'A get_inbox response contained an incorrect number of fields.')
+
+        try:
+            self.msg_id = int(parts[0])
+            self.sender = parts[1]
+            self.message = parts[2]
+            self.msisdn = parts[4]
+            self.referring_msg_id = int(parts[5])
+        except ValueError, e:
+            raise CommunicationException(\
+                'One or more fields from a get_inbox response were invalid.')
+
+        try:
+            ts = time.mktime(time.strptime(parts[3], '%Y-%m-%d %H:%M:%S'))
+            self.received_time = datetime.datetime.fromtimestamp(ts)
+        except ValueError, e:
+            raise CommunicationException(\
+                'A get_inbox response contained an incorrect received_time.')
+
+        return self
+
+    from_response = classmethod(from_response)
+
+
+
 
 class BulkSMS:
     """
@@ -242,10 +283,11 @@ class BulkSMS:
     ]
 
     _ports_paths = {
-        'send_sms':          ( 5567, '/eapi/submission/send_sms/1/1.1' ),
-        'quote_sms':         ( 7512, '/eapi/1.0/quote_sms.mc' ),
-        'get_report':        ( 7512, '/eapi/1.0/get_report.mc' ),
-        'get_credits':       ( 7512, '/eapi/1.0/get_credits.mc' ),
+        'send_sms':         ( 5567, '/eapi/submission/send_sms/1/1.1' ),
+        'quote_sms':        ( 7512, '/eapi/1.0/quote_sms.mc' ),
+        'get_report':       ( 7512, '/eapi/1.0/get_report.mc' ),
+        'get_credits':      ( 7512, '/eapi/1.0/get_credits.mc' ),
+        'get_inbox':        ( 5567, '/eapi/reception/get_inbox/1/1.0' )
     }
 
 
@@ -417,6 +459,26 @@ class BulkSMS:
 
             poll_time -= poll_wait
             time.sleep(poll_wait)
+
+
+
+
+    def get_inbox(self, last_retrieved_id = 0, **options):
+        '''
+        Return a list of InboxMessage instances, corresponding to each message
+        in this BulkSMS account's inbox, starting at <last_retrieved_id>.
+        '''
+
+        data = {
+            'last_retrieved_id': last_retrieved_id
+        }
+
+        self._apply_options(data, options, self._bare_request)
+        lines = self._http_request('get_inbox', data, options)
+        code, desc, return_value = self._parse_status(lines)
+        self._raise_status(code, desc)
+
+        return [ InboxMessage.from_response(line) for line in lines if line ]
 
 
 

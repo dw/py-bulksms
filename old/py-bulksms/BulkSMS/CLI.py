@@ -18,6 +18,7 @@ def usage(argv0):
     print argv0, "quote   <opts> <msg> <phone1> [phone2 ..]"
     print argv0, "report  <opts> <msg_id> [phone1]"
     print argv0, "poll    <opts> <msg_id> [phone1]"
+    print argv0, "inbox   <opts> [<starting_id>]"
     print argv0, "credits <opts>"
     print
     print "Options:"
@@ -37,7 +38,8 @@ def usage(argv0):
     print "   send  sends a message,"
     print "  quote  retrieves the cost for sending a message,"
     print " report  retrieves a delivery report,"
-    print "   poll  Displays message status until delivered, and"
+    print "   poll  Displays message status until delivered,"
+    print "  inbox  Fetches messages from account inbox, and"
     print "credits  retrieves the total credits on your account."
     print
     print "A simple '<keyword>: <phone1>, <phone2>, <phone3><nl>' format"
@@ -168,7 +170,7 @@ def command_line(argv):
     if  command_args.get('repliable', False) and 'sender' in command_args:
         del command_args['sender']
 
-    if mode not in ( "send", "quote", "credits", "report", "poll" ):
+    if mode not in ( "send", "quote", "credits", "report", "poll", "inbox" ):
         print "!!! Please specify a valid mode."
         return 1
 
@@ -213,12 +215,26 @@ def command_line(argv):
         return 0
 
 
-    if mode == 'credits':
+    elif mode == 'credits':
         print "Credits available:", BulkSMS.format_credits(server.get_credits())
         return 0
 
 
-    if mode == 'report' or mode == 'poll':
+    elif mode == 'inbox':
+        if len(arguments) == 0:
+            last_retrieved_id = 0
+        else:
+            last_retrieved_id = int(arguments[0])
+
+        messages = server.get_inbox(last_retrieved_id, **command_args)
+
+        print len(messages), "total."
+        for message in messages:
+            print message
+
+        print
+
+    elif mode == 'report' or mode == 'poll':
         if len(arguments) < 1 or len(arguments) > 2:
             print "!!! Please specify a <msg_id> and optionally a recipient."
             return 0
