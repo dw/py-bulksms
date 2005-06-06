@@ -193,6 +193,10 @@ def command_line(argv):
             else:
                 message = input_file.read()
         else:
+            if not len(arguments):
+                print "!!! Please specify your message and at least one",\
+                    "recipient."
+                return 1
             message = arguments.pop(0)
 
         recipients = arguments
