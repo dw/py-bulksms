@@ -182,7 +182,7 @@ def command_line(argv):
 
 
 
-    server = BulkSMS.BulkSMS(username, password)
+    server = BulkSMS.Server(username, password)
     server.phonebook = BulkSMS.PhoneBook.HomedirPhoneBook()
 
     if mode == 'send' or mode == 'quote':

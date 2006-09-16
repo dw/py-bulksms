@@ -238,7 +238,7 @@ class InboxMessage:
 
 
 
-class BulkSMS:
+class Server:
     '''
     Main SMS server communication class. Allows transmission of one or multiple
     messages, and confirmation of delivery.
@@ -631,7 +631,7 @@ class BulkSMS:
         else:
             used_opts_str = ''
 
-        return 'BulkSMS(%r, %r%s)' % \
+        return 'BulkSMS.Server(%r, %r%s)' % \
             ( self.username, self.password, used_opts_str)
 
 
