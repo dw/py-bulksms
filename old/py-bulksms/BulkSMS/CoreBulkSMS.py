@@ -5,6 +5,15 @@ BulkSMS/CoreBulkSMS.py: Core BulkSMS package functionality.
 __author__ = 'David M. Wilson <dw-CoreBulkSMS.py@botanicus.net>'
 __version__ = '0.1'
 
+__all__ = [
+    'BulkSMSException', 'MessageLengthException', 'AuthenticationException',
+    'DataValidationException', 'InsufficientCreditsException',
+    'DuplicateMessageException', 'QuotaException', 'MessageNotFoundException',
+    'InternalFatalError', 'UnknownException', 'CommunicationException',
+
+    'format_credits', 'BulkSMS'
+]
+
 import urllib, urllib2, time, PhoneBook, datetime
 
 
