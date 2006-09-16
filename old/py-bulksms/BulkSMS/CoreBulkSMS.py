@@ -11,7 +11,7 @@ __all__ = [
     'DuplicateMessageException', 'QuotaException', 'MessageNotFoundException',
     'InternalFatalError', 'UnknownException', 'CommunicationException',
 
-    'format_credits', 'BulkSMS'
+    'format_credits', 'Server'
 ]
 
 import urllib, urllib2, time, PhoneBook, datetime
