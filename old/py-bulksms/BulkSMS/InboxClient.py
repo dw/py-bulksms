@@ -114,10 +114,10 @@ class InboxClient:
 
 
     def _parse_status(self, lines):
-        """
+        '''
         Remove the status line from <lines>, and return a
         (<code>, <description>, <return_value>)
-        """
+        '''
 
         status = lines.pop(0).split('|')
         return_value = None
@@ -142,12 +142,12 @@ class InboxClient:
 
 
     def _do_session(self, req_dict):
-        self.session_file.write(urllib.urlencode(fields) + "\n")
+        self.session_file.write(urllib.urlencode(fields) + '\n')
         response = []
 
         while 1:
             line = self.session_file.readline()
-            if line == "\n":
+            if line == '\n':
                 break
 
             response.append(line[:-1])

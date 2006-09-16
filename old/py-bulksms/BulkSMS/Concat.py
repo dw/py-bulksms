@@ -41,7 +41,7 @@ def convert8to7bit(str):
 
 class LongSMS:
     def __init__(self, message = None, msgid = None):
-        self.header = array.array('B', "\x05\x00\x03\x01\x00\x00\x00")
+        self.header = array.array('B', '\x05\x00\x03\x01\x00\x00\x00')
         self.header[3] = msgid or int(time.time()) % 256
         self.data = ''
 

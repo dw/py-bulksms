@@ -11,9 +11,9 @@ import urllib, urllib2, time, PhoneBook, datetime
 
 
 class BulkSMSException(Exception):
-    """
+    '''
     Exception. Base class for all BulkSMS.co.uk exceptions.
-    """
+    '''
 
     pass
 
@@ -21,9 +21,9 @@ class BulkSMSException(Exception):
 
 
 class MessageLengthException(BulkSMSException):
-    """
+    '''
     Exception. Raised when an SMS message is too long to transmit.
-    """
+    '''
 
     def __init__(self, len, max):
         self.len = len
@@ -31,122 +31,123 @@ class MessageLengthException(BulkSMSException):
 
     def __str__(self):
         return \
-            "SMS message too long. Maximum: %d, length: %d" % \
+            'SMS message too long. Maximum: %d, length: %d' % \
             ( self.max, self.len )
 
 
 
 
 class AuthenticationException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk refuse our (<username>, <password>).
-    """
+    '''
 
     def __init__(self, description):
         self.status_code = 23
         self.status_description = description
 
     def __str__(self):
-        return "Authentication failure: %s" % self.status_description
+        return 'Authentication failure: %s' % self.status_description
 
 
 
 
 class DataValidationException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk indicate our supplied values were
     incorrect.
-    """
+    '''
 
     def __init__(self, description):
         self.status_code = 24
         self.status_description = description
 
     def __str__(self):
-        return "Data validation failed: %s" % self.status_description
+        return 'Data validation failed: %s' % self.status_description
 
 
 
 
 class InsufficientCreditsException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk indicate we do not have enough credits
     to send a message.
-    """
+    '''
 
     def __init__(self, code, description):
         self.status_code = 24
         self.status_description = description
 
     def __str__(self):
-        return "Insufficient credit: %s" % self.status_description
+        return 'Insufficient credit: %s' % self.status_description
 
 
 
 
 class DuplicateMessageException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk indicate that this message is a
     duplicate and nodup is enabled.
-    """
+    '''
 
     def __init__(self):
         self.status_code = 50
 
     def __str__(self):
-        return "Duplicate message detected."
+        return 'Duplicate message detected.'
 
 
 
 
 class QuotaException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk indicate we have reached our
     transmission quota.
-    """
+    '''
 
     def __init__(self, code, description):
         self.status_code = code
         self.status_description = description
 
     def __str__(self):
-        return "Transmission quota reached: %s" % self.status_description
+        return 'Transmission quota reached: %s' % self.status_description
 
 
 
 
 class MessageNotFoundException(BulkSMSException):
-    """
+    '''
     Exception. Raised when BulkSMS.co.uk cannot find a msg_id we have requested.
-    """
+    '''
 
     def __init__(self):
         self.status_code = 1001
 
     def __str__(self):
-        return "Message not found."
+        return 'Message not found.'
 
 
 
 
 class InternalFatalError(BulkSMSException):
-    """
+    '''
     Exception. Raised when an internal fatal error occurs at BulkSMS.co.uk.
-    """
+    '''
 
     def __init__(self):
         self.status_code = 22
 
     def __str__(self):
-        return "Internal fatal error."
+        return 'Internal fatal error.'
 
 
 
 
 class UnknownException(BulkSMSException):
-    """
-    Exception. Raised when an unknown status message is returned by BulkSMS.co.uk.
-    """
+    '''
+    Exception. Raised when an unknown status message is returned by
+    BulkSMS.co.uk.
+    '''
 
     def __init__(self, status_code, status_description = None):
         self.status_code = int(status_code)
@@ -154,7 +155,7 @@ class UnknownException(BulkSMSException):
 
     def __str__(self):
         if not self.status_description:
-            return "Unknown error %d occured." % self.status_code
+            return 'Unknown error %d occured.' % self.status_code
 
         return "Unknown error %d occurred: '%s'" % \
             ( self.status_code, self.status_description )
@@ -163,9 +164,9 @@ class UnknownException(BulkSMSException):
 
 
 class CommunicationException(BulkSMSException):
-    """
+    '''
     Exception. Raised when we could not talk to BulkSMS.co.uk.
-    """
+    '''
 
     def __init__(self, reason):
         self.reason = reason
@@ -176,12 +177,12 @@ class CommunicationException(BulkSMSException):
 
 
 def format_credits(credits):
-    """
+    '''
     Return a string representation of the floating point number <credits>
     formatted as BulkSMS.co.uk format their floats.
-    """
+    '''
 
-    return "%3.2f" % credits
+    return '%3.2f' % credits
 
 
 
@@ -229,7 +230,7 @@ class InboxMessage:
 
 
 class BulkSMS:
-    """
+    '''
     Main SMS server communication class. Allows transmission of one or multiple
     messages, and confirmation of delivery.
 
@@ -239,13 +240,13 @@ class BulkSMS:
     <msg_class> is the message class. A value of 0 indicates a flash message, 2
     indicates a normal SMS.
 
-    <dca> is the Data Coding Alphabet. One of "7bit", "8bit", or "16bit".
+    <dca> is the Data Coding Alphabet. One of '7bit', '8bit', or '16bit'.
     Messages may be a maximum of 280 characters for 7bit and 8bit types.
 
     <want_report> specifies whether or not we would like a delivery report.
 
-    <cost_route> is an integer ranging from 1, lowest cost to 3, better quality.
-    Higher quality routes may deliver more reliably or faster.
+    <cost_route> is an integer ranging from 1, lowest cost to 3, better
+    quality. Higher quality routes may deliver more reliably or faster.
 
     <msg_id> is currently unused. It will be your unique ID for the message.
 
@@ -266,7 +267,7 @@ class BulkSMS:
 
     <repliable> indicates that this SMS should initiate a 2-way SMS if at
     all possible.
-    """
+    '''
 
     _server = 'www.bulksms.co.uk'
     _max_lengths = { '7bit': 160, '8bit': 280, '16bit': 280 }
@@ -295,7 +296,7 @@ class BulkSMS:
 
     def __init__(self, username, password, **kwargs):
         if type(username) != str or type(password) != str:
-            raise ValueError, "username and password must be strings."
+            raise ValueError, 'username and password must be strings.'
 
         self.username = username
         self.password = password
@@ -320,7 +321,7 @@ class BulkSMS:
 
 
     def send_sms(self, recipients, message, **options):
-        """
+        '''
         Send a message to multiple recipients.
 
         <recipients> is a list of telephone numbers to transmit the message to,
@@ -329,7 +330,7 @@ class BulkSMS:
 
         <message> is the text message in the character set specified by <dca>.
         Other optional fields are described in the class documentation.
-        """
+        '''
 
         self._phonebook_expand(recipients)
 
@@ -351,11 +352,11 @@ class BulkSMS:
 
 
     def quote_sms(self, recipients, message, **options):
-        """
+        '''
         Return a floating point number indicating the number of credits that
         would be used to send a message. All parameters are, and should be
         identical to those used in send_sms.
-        """
+        '''
 
         self._phonebook_expand(recipients)
 
@@ -377,10 +378,10 @@ class BulkSMS:
 
 
     def get_credits(self, **options):
-        """
-        Return a floating point number indicating the amount of credit remaining
-        on this BulkSMS.co.uk account.
-        """
+        '''
+        Return a floating point number indicating the amount of credit
+        remaining on this BulkSMS.co.uk account.
+        '''
 
         data = {}
 
@@ -395,11 +396,11 @@ class BulkSMS:
 
 
     def get_report(self, msg_id, recipient = None, **options):
-        """
-        Returns a list of (<recipient>, <status_code>, <description>) triples for
-        the given <msg_id>. If <recipient> is specified, return a list of one
-        triple for the given recipient.
-        """
+        '''
+        Returns a list of (<recipient>, <status_code>, <description>) triples
+        for the given <msg_id>. If <recipient> is specified, return a list of
+        one triple for the given recipient.
+        '''
 
         recipient = self._phonebook_expand_string(recipient)
 
@@ -426,7 +427,7 @@ class BulkSMS:
 
 
     def poll_report(self, msg_id, report_fn, recipient = None, **options):
-        """
+        '''
         Periodically ask BulkSMS for a delivery report for the given
         <msg_id>. If <recipient> is given, then only ask for the status
         of that recipient.
@@ -434,7 +435,7 @@ class BulkSMS:
         When the status changes, hand <report_fn> the list returned by
         get_report(). All arguments, with the exception of <report_fn>,
         are identical to get_report().
-        """
+        '''
 
         poll_time = self.poll_time or (5 * 60)
         poll_wait = self.poll_wait or 10
@@ -484,10 +485,10 @@ class BulkSMS:
 
 
     def _test_message_length(self, message, options):
-        """
+        '''
         Check the given messages do not exceed the given limits for their data
         coding alphabet.
-        """
+        '''
 
         dca = options.get('dca', '7bit')
         length = len(message)
@@ -502,10 +503,10 @@ class BulkSMS:
 
 
     def _parse_status(self, lines):
-        """
+        '''
         Remove the status line from <lines>, and return a
         (<code>, <description>, <return_value>)
-        """
+        '''
 
         code = None
         description = None
@@ -539,6 +540,7 @@ class BulkSMS:
         if code in ok_codes:
             return
 
+        # TODO(dmw): make this a dict.
         if   code == 22:
             raise InternalFatalError
         if   code == 23:
@@ -560,10 +562,10 @@ class BulkSMS:
 
 
     def _apply_options(self, data_dict, user_options, applicable = None):
-        """
+        '''
         Update <data_dict> to include the options from <options>, and any
         configured for this class instance.
-        """
+        '''
 
         applicable_options = (
             'username', 'password', 'sender', 'msg_class',
@@ -690,9 +692,9 @@ class BulkSMS:
 
 
     def _http_request(self, request, data, options):
-        """
+        '''
         Make an HTTP request to BulkSMS.co.uk.
-        """
+        '''
 
         port, path = self._ports_paths[request]
 
