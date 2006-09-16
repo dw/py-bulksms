@@ -157,7 +157,7 @@ license. Please see the file <code>LICENSE</code> from the source distribution.
 	</p>
 
 	<kbd>
-		&gt; s = BulkSMS.BulkSMS('username', 'password')<br />
+		&gt; s = BulkSMS.Server('username', 'password')<br />
 	</kbd>
 
 	<p>
@@ -246,7 +246,7 @@ license. Please see the file <code>LICENSE</code> from the source distribution.
 		&gt; to = [ '447967123123', '447967321321' ]<br />
 		&gt;<br />
 		&gt; s<br />
-		BulkSMS('username', 'password', cost_route=3)<br />
+		BulkSMS.Server('username', 'password', cost_route=3)<br />
 		&gt; s.quote_sms(to, msg, sender = from)<br />
 		3.0<br />
 	</kbd>
@@ -328,12 +328,12 @@ license. Please see the file <code>LICENSE</code> from the source distribution.
 
 	<kbd>
 		&gt; s<br />
-		BulkSMS('username', 'password')<br />
+		BulkSMS.Server('username', 'password')<br />
 		&gt; s.sender = 'Default Sender'<br />
 		&gt; s<br />
-		BulkSMS('username', 'password', sender='Default Sender')<br />
+		BulkSMS.Server('username', 'password', sender='Default Sender')<br />
 		&gt; s.secure_repr = True<br />
-		&lt;instance of BulkSMS.BulkSMS with id 1078290636&gt;
+		&lt;instance of BulkSMS.Server with id 1078290636&gt;
 	</kbd>
 
 
