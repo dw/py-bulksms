@@ -41,17 +41,23 @@ class HomedirPhoneBook(BasePhoneBook):
     Phonebook stored in user's home directory as text.
     '''
 
-    def __init__(self):
-        self.phonebook = {}
+    def get_pathname(cls):
+        '''
+        Return the path to the phone book.
+        '''
 
         homedir = os.getenv('HOME') \
             or os.getenv('USERPROFILE') or None
 
-        if not homedir:
-            return
+        if homedir:
+            return os.path.join(homedir, '.bulksms', 'phonebook')
+
+    get_pathname = classmethod(get_pathname)
 
 
-        pathname = os.path.join(homedir, '.sms_phonebook')
+    def __init__(self):
+        self.phonebook = {}
+        pathname = self.get_pathname()
 
         if not os.path.exists(pathname):
             return

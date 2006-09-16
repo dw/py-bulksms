@@ -13,6 +13,8 @@ def usage(argv0):
     Print command-line program usage.
     '''
 
+    pb_path = BulkSMS.PhoneBook.HomedirPhoneBook.get_pathname()
+
     print __doc__
     print argv0, 'send    <opts> <msg> <phone1> [phone2 ..]'
     print argv0, 'quote   <opts> <msg> <phone1> [phone2 ..]'
@@ -43,7 +45,7 @@ def usage(argv0):
     print 'credits  retrieves the total credits on your account.'
     print
     print "A simple '<keyword>: <phone1>, <phone2>, <phone3><nl>' format"
-    print 'shortcut database is stored in your homedir/.sms_phonebook.'
+    print 'shortcut database is stored in:', pb_path
     print
 
 
