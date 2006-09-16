@@ -653,7 +653,7 @@ class BulkSMS:
 
 
     def _phonebook_expand_string(self, string):
-        if self.phonebook == None:
+        if not self.phonebook or string is None:
             return string
 
         result = self.phonebook.lookup_keyword(string)
