@@ -2,8 +2,9 @@
 
 '''
 sms: User interface to BulkSMS.CLI.
-Author: David M. Wilson <dw-sms@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 import BulkSMS, BulkSMS.CLI
 import sys, os, getopt

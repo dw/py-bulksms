@@ -1,7 +1,8 @@
 """
 BulkSMS/Commander.py: Interactive curses interface to BulkSMS.
-Author: David M. Wilson <dw-BulkSMS_Commander.py@botanicus.net>.
 """
+
+__author__ = 'David Wilson'
 
 import os, time, sys
 import curses, curses.textpad

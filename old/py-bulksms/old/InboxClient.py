@@ -1,8 +1,9 @@
 
 '''
 BulkSMS/InboxClient.py: 2-way SMS server inbox client.
-Author: David M. Wilson <dw-InboxServer.py@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 import urllib2, socket
 from CoreBulkSMS import BulkSMSException

@@ -1,7 +1,8 @@
 '''
 BulkSMS/PhoneBook.py: Phone book classes and interface.
-Author: David M. Wilson <dw-BulkSMS_PhoneBook.py@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 import os
 

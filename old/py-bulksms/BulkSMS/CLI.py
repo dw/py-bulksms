@@ -1,7 +1,8 @@
 '''
 BulkSMS/CLI.py: Command-line wrapper around BulkSMS.
-Author: David M. Wilson <dw-BulkSMS_CLI.py@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 import getopt, os, time, sys
 import BulkSMS, BulkSMS.PhoneBook

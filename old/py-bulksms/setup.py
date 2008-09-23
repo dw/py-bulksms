@@ -5,11 +5,9 @@ from distutils.core import setup
 setup(name="BulkSMS",
 	version="0.2a2",
 	description="BulkSMS.co.uk Python implementation.",
-	author="David M. Wilson",
-	author_email="dw-BulkSMS-setup.py@botanicus.net",
+	author="David Wilson",
 	license='LGPL',
-	url="http://botanicus.net/dw/",
-	download_url="http://botanicus.net/dw/dl/bulksms-0.2a2.tar.gz",
+	url="http://code.google.com/p/py-sms/",
 	packages=['BulkSMS'],
 	scripts=['sms']
 )

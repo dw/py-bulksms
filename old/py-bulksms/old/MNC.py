@@ -1,8 +1,9 @@
 
 '''
 BulkSMS/MNC.py: Mobile Network Codes.
-Author: David M. Wilson <dw-BulkSMS_MNC.py@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 
 mobile_network_codes = {

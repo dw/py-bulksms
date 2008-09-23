@@ -2,8 +2,7 @@
 BulkSMS/CoreBulkSMS.py: Core BulkSMS package functionality.
 '''
 
-__author__ = 'David M. Wilson <dw-CoreBulkSMS.py@botanicus.net>'
-__version__ = '0.1'
+__author__ = 'David Wilson'
 
 __all__ = [
     'BulkSMSException', 'MessageLengthException', 'AuthenticationException',

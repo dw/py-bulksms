@@ -1,8 +1,9 @@
 
 """
 OperatorLogo.py: Classes and utilities for working with Nokia Operator Logos.
-Author: David M. Wilson <dw-OperatorLogo.py@botanicus.net>.
 """
+
+__author__ = 'David Wilson'
 
 import os, array
 

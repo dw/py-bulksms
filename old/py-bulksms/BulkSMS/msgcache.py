@@ -1,7 +1,8 @@
 '''
 BulkSMS/msgcache.py: Client-side message cache.
-Author: David M. Wilson <dw-bulksms@botanicus.net>
 '''
+
+__author__ = 'David Wilson'
 
 import os, time, sys, pickle
 from BulkSMS import BulkSMSException

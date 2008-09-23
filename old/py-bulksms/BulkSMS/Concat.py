@@ -1,9 +1,9 @@
 
 '''
 Concat.py: support for concatenated messages.
-Copyright 2003, David Wilson. All rights reserved.
-Author: David M. Wilson <dw-Concat.py@botanicus.net>.
 '''
+
+__author__ = 'David Wilson'
 
 import time, array, StringIO
 

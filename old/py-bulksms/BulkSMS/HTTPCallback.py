@@ -2,8 +2,7 @@
 BulkSMS/HTTPCallback.py: Handle user HTTP relay requests.
 '''
 
-__author__ = 'David M. Wilson <dw-BulkSMS_CLI.py@botanicus.net>'
-__version__ = '0.1'
+__author__ = 'David Wilson'
 
 from CoreBulkSMS import BulkSMSException
 import cgi
