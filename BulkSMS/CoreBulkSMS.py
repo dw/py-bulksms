@@ -242,6 +242,9 @@ class Server:
     Main SMS server communication class. Allows transmission of one or multiple
     messages, and confirmation of delivery.
 
+    <address> is the address of the BulkSMS server e.g 'usa.bulksms.com'.
+    Defaults to 'www.bulksms.co.uk' if not supplied.
+
     <sender> is the sender field of the message; if numeric, maximum 14 bytes,
     if alphanumeric, maximum 11 bytes.
 
@@ -277,7 +280,7 @@ class Server:
     all possible.
     '''
 
-    _server = 'www.bulksms.co.uk'
+    _server = 'www.bulksms.co.uk'  # Default
     _max_lengths = { '7bit': 160, '8bit': 280, '16bit': 280 }
     _bare_request = ( 'username', 'password' )
 
@@ -302,9 +305,12 @@ class Server:
 
 
 
-    def __init__(self, username, password, **kwargs):
+    def __init__(self, username, password, address=None, **kwargs):
         if type(username) != str or type(password) != str:
             raise ValueError, 'username and password must be strings.'
+
+        if address is not None:
+            self._server = address
 
         self.username = username
         self.password = password
