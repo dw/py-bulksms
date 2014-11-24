@@ -3,11 +3,11 @@
 from distutils.core import setup
 
 setup(name="BulkSMS",
-	version="0.2a2",
+	version="0.3",
 	description="BulkSMS.co.uk Python implementation.",
 	author="David Wilson",
 	license='LGPL',
-	url="http://code.google.com/p/py-sms/",
+	url="http://github.com/dw/py-bulksms/",
 	packages=['BulkSMS'],
 	scripts=['sms']
 )
