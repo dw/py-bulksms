@@ -295,14 +295,12 @@ class Server:
     ]
 
     _ports_paths = {
-        'send_sms':         ( 5567, '/eapi/submission/send_sms/1/1.1' ),
+        'send_sms':         ( 80, '/eapi/submission/send_sms/2/2.0' ),
         'quote_sms':        ( 7512, '/eapi/1.0/quote_sms.mc' ),
-        'get_report':       ( 7512, '/eapi/1.0/get_report.mc' ),
-        'get_credits':      ( 7512, '/eapi/1.0/get_credits.mc' ),
+        'get_report':       ( 80, '/eapi/status_reports/get_report/2/2.0' ),
+        'get_credits':      ( 80, '/eapi/user/get_credits/1/1.1' ),
         'get_inbox':        ( 5567, '/eapi/reception/get_inbox/1/1.0' )
     }
-
-
 
 
     def __init__(self, username, password, address=None, **kwargs):
@@ -404,7 +402,7 @@ class Server:
         code, desc, return_value = self._parse_status(lines)
         self._raise_status(code, desc)
 
-        return float(return_value)
+        return float(desc)
 
 
 
@@ -504,6 +502,9 @@ class Server:
         coding alphabet.
         '''
 
+        if 'allow_concat_text_sms' in options and options['allow_concat_text_sms'] > 0:
+            return
+
         dca = options.get('dca', '7bit')
         length = len(message)
 
@@ -549,7 +550,7 @@ class Server:
         Raise an error if the <code> indicates failure.
         '''
 
-        ok_codes = ( None, 0, 10, 11, 12, )
+        ok_codes = ( None, 0, 1, 10, 11, 12, )
 
         if code in ok_codes:
             return
@@ -584,7 +585,8 @@ class Server:
         applicable_options = (
             'username', 'password', 'sender', 'msg_class',
             'dca', 'want_report', 'cost_route', 'nodup',
-            'repliable'
+            'repliable', 'allow_concat_text_sms', 'concat_text_sms_max_parts',
+            'send_time', 'stop_dup_id', 'test_always_succeed', 'test_always_fail'
         )
 
         if applicable is not None:
@@ -613,6 +615,9 @@ class Server:
                 return '1'
             else:
                 return '0'
+
+        if isinstance(value, datetime.datetime):
+            return value.strftime("%Y-%m-%d %H:%M:%S")
 
         return str(value)
 
