@@ -639,7 +639,7 @@ class Server:
 
         wait = options.get('transient_wait', self.transient_wait)
         retries = options.get('transient_retries', self.transient_retries)
-        data_encoded = urllib.parse.urlencode(data)
+        data_encoded = urllib.urlencode(data)
 
         url = 'http://%s:%d%s' % ( self._server, port, path )
 
