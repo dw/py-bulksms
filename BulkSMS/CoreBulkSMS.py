@@ -604,7 +604,7 @@ class Server:
         """
 
         try:
-            return urllib.request.urlopen(url, data)
+            return urllib.request.urlopen(url, data.encode())
 
         except urllib.error.HTTPError as error:
             raise CommunicationException('HTTP server: %s' % error)
@@ -621,7 +621,7 @@ class Server:
             retries -= 1
 
             try:
-                return urllib.request.urlopen(url, data)
+                return urllib.request.urlopen(url, data.encode())
 
             except urllib.error.HTTPError as error:
                 time.sleep(wait)
@@ -639,7 +639,7 @@ class Server:
 
         wait = options.get('transient_wait', self.transient_wait)
         retries = options.get('transient_retries', self.transient_retries)
-        data_encoded = urllib.urlencode(data)
+        data_encoded = urllib.parse.urlencode(data)
 
         url = 'http://%s:%d%s' % ( self._server, port, path )
 
