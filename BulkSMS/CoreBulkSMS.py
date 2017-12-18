@@ -649,4 +649,4 @@ class Server:
         else:
             response = self._http_retry(url, data_encoded, wait, retries)
 
-        return response.read().split('\n')
+        return response.read().decode(response.headers.get_content_charset('utf-8')).split('\n')
