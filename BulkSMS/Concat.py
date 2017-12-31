@@ -1,19 +1,18 @@
 
-'''
+"""
 Concat.py: support for concatenated messages.
-'''
+"""
 
 __author__ = 'David Wilson'
 
-import time, array, StringIO
-
+import time, array, io
 
 
 def convert8to7bit(str):
-    '''
+    """
     Convert 8bit string to compressed 7bit string of hex values. Returns
     string.
-    '''
+    """
 
     length = len(str)
     str = str + '\0'
@@ -37,8 +36,6 @@ def convert8to7bit(str):
     return dp
 
 
-
-
 class LongSMS:
     def __init__(self, message = None, msgid = None):
         self.header = array.array('B', '\x05\x00\x03\x01\x00\x00\x00')
@@ -53,16 +50,14 @@ class LongSMS:
         if message is not None:
             self.feed(message)
 
-
     def feed(self, data):
         self.data += data
-
 
     def to_8bit(self):
         output = []
 
         header = self.header
-        data = StringIO.StringIO(convert8to7bit(self.data))
+        data = io.StringIO(convert8to7bit(self.data))
 
         segment_max_len = 140 - len(header)
         data_len = len(self.data)

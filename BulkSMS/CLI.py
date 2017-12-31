@@ -1,6 +1,6 @@
-'''
+"""
 BulkSMS/CLI.py: Command-line wrapper around BulkSMS.
-'''
+"""
 
 __author__ = 'David Wilson'
 
@@ -8,58 +8,54 @@ import getopt, os, time, sys
 import BulkSMS, BulkSMS.PhoneBook
 
 
-
 def usage(argv0):
-    '''
+    """
     Print command-line program usage.
-    '''
+    """
 
     pb_path = BulkSMS.PhoneBook.HomedirPhoneBook.get_pathname()
 
-    print __doc__
-    print argv0, 'send    <opts> <msg> <phone1> [phone2 ..]'
-    print argv0, 'quote   <opts> <msg> <phone1> [phone2 ..]'
-    print argv0, 'report  <opts> <msg_id> [phone1]'
-    print argv0, 'poll    <opts> <msg_id> [phone1]'
-    print argv0, 'inbox   <opts> [<starting_id>]'
-    print argv0, 'credits <opts>'
-    print
-    print 'Options:'
-    print '   --sender=<sender>        Sender field.'
-    print '   --flash                  Send as flash message.'
-    print '   --dca=<7bit|8bit|16bit>  Data coding alphabet.'
-    print '   --report                 Request delivery report.'
-    print '   --cost_route=<1|2|3>     Message route.'
-    print '   --nodup                  Suppress duplicate messages.'
-    print '   --wait=<integer>         Seconds to wait between failures.'
-    print '   --retry=<integer>        Number of attempts before failing.'
-    print '   --username=<string>      Username to connect using.'
-    print '   --password=<string>      Password to connect using.'
-    print '   --poll                   After sending immediately start poll.'
-    print '   --repliable              Initiate a 2-way SMS.'
-    print
-    print '   send  sends a message,'
-    print '  quote  retrieves the cost for sending a message,'
-    print ' report  retrieves a delivery report,'
-    print '   poll  Displays message status until delivered,'
-    print '  inbox  Fetches messages from account inbox, and'
-    print 'credits  retrieves the total credits on your account.'
-    print
-    print "A simple '<keyword>: <phone1>, <phone2>, <phone3><nl>' format"
-    print 'shortcut database is stored in:', pb_path
-    print
-
+    print(__doc__)
+    print(argv0, 'send    <opts> <msg> <phone1> [phone2 ..]')
+    print(argv0, 'quote   <opts> <msg> <phone1> [phone2 ..]')
+    print(argv0, 'report  <opts> <msg_id> [phone1]')
+    print(argv0, 'poll    <opts> <msg_id> [phone1]')
+    print(argv0, 'inbox   <opts> [<starting_id>]')
+    print(argv0, 'credits <opts>')
+    print()
+    print('Options:')
+    print('   --sender=<sender>        Sender field.')
+    print('   --flash                  Send as flash message.')
+    print('   --dca=<7bit|8bit|16bit>  Data coding alphabet.')
+    print('   --report                 Request delivery report.')
+    print('   --cost_route=<1|2|3>     Message route.')
+    print('   --nodup                  Suppress duplicate messages.')
+    print('   --wait=<integer>         Seconds to wait between failures.')
+    print('   --retry=<integer>        Number of attempts before failing.')
+    print('   --username=<string>      Username to connect using.')
+    print('   --password=<string>      Password to connect using.')
+    print('   --poll                   After sending immediately start poll.')
+    print('   --repliable              Initiate a 2-way SMS.')
+    print()
+    print('   send  sends a message,')
+    print('  quote  retrieves the cost for sending a message,')
+    print(' report  retrieves a delivery report,')
+    print('   poll  Displays message status until delivered,')
+    print('  inbox  Fetches messages from account inbox, and')
+    print('credits  retrieves the total credits on your account.')
+    print()
+    print("A simple '<keyword>: <phone1>, <phone2>, <phone3><nl>' format")
+    print('shortcut database is stored in:', pb_path)
+    print()
 
 
 def format_status_report(triple):
-    '''
+    """
     Return a string containing a formatted version of the given <triple>. The
     <triple> is one returned in the list from BulkSMS.get_report().
-    '''
+    """
 
     return '%-14s %2s %s' % triple
-
-
 
 
 class _FileReporter(object):
@@ -69,33 +65,28 @@ class _FileReporter(object):
 
     def report(self, result):
         for triple in result:
-            print >> self.output, format_status_report(triple)
-
-
+            print(format_status_report(triple), file=self.output)
 
 
 def poll_report_text(server, msg_id, recipient = None, output = sys.stdout):
-    '''
+    """
     Call poll_report in such a way as to print status reports to the given
     file object <output>.
-    '''
+    """
 
     server.poll_report(msg_id, _FileReporter(output).report, recipient)
 
 
-
-
 def command_line(argv):
-    '''
+    """
     Act as a command-line tool.
-    '''
+    """
 
     long_options = [
         'sender=', 'flash', 'dca=', 'report', 'cost_route=', 'nodup',
         'wait=', 'retry=', 'username=', 'password=', 'poll',
         'repliable', 'file=',
     ]
-
 
     if len(argv) < 2:
         usage(argv[0])
@@ -109,7 +100,6 @@ def command_line(argv):
 
     else:
         mode = None
-
 
     command_args = {}
     input_file = None
@@ -169,19 +159,16 @@ def command_line(argv):
             else:
                 input_file = open(argument)
 
-
-    if  command_args.get('repliable', False) and 'sender' in command_args:
+    if command_args.get('repliable', False) and 'sender' in command_args:
         del command_args['sender']
 
     if mode not in ( 'send', 'quote', 'credits', 'report', 'poll', 'inbox' ):
-        print '!!! Please specify a valid mode.'
+        print('!!! Please specify a valid mode.')
         return 1
 
     if not username or not password:
-        print '!!! Please specify a username and password.'
+        print('!!! Please specify a username and password.')
         return 1
-
-
 
     server = BulkSMS.Server(username, password)
     server.phonebook = BulkSMS.PhoneBook.HomedirPhoneBook()
@@ -189,43 +176,41 @@ def command_line(argv):
     if mode == 'send' or mode == 'quote':
         if input_file is not None:
             if input_file is sys.stdin:
-                print 'Enter your message followed by EOL> ',
+                print('Enter your message followed by EOL> ', end=' ')
                 sys.stdout.flush()
                 message = input_file.read()
-                print
+                print()
             else:
                 message = input_file.read()
         else:
             if not len(arguments):
-                print '!!! Please specify your message and at least one' \
-                    ' recipient.'
+                print('!!! Please specify your message and at least one' \
+                    ' recipient.')
                 return 1
             message = arguments.pop(0)
 
         recipients = arguments
 
         if len(recipients) < 1:
-            print '!!! Please specify your message and at least one recipient.'
+            print('!!! Please specify your message and at least one recipient.')
             return 1
 
         if mode == 'quote':
             cost = server.quote_sms(recipients, message, **command_args)
-            print 'Message cost:', BulkSMS.format_credits(cost), 'credits.'
+            print('Message cost:', BulkSMS.format_credits(cost), 'credits.')
 
         else:
             msg_id = server.send_sms(recipients, message, **command_args)
-            print 'Message sent. Message ID:', msg_id
+            print('Message sent. Message ID:', msg_id)
 
             if poll:
                 poll_report_text(server, msg_id)
 
         return 0
 
-
     elif mode == 'credits':
-        print 'Credits available:', BulkSMS.format_credits(server.get_credits())
+        print('Credits available:', BulkSMS.format_credits(server.get_credits()))
         return 0
-
 
     elif mode == 'inbox':
         if len(arguments) == 0:
@@ -235,15 +220,15 @@ def command_line(argv):
 
         messages = server.get_inbox(last_retrieved_id, **command_args)
 
-        print len(messages), 'total.'
+        print(len(messages), 'total.')
         for message in messages:
-            print message
+            print(message)
 
-        print
+        print()
 
     elif mode == 'report' or mode == 'poll':
         if len(arguments) < 1 or len(arguments) > 2:
-            print '!!! Please specify a <msg_id> and optionally a recipient.'
+            print('!!! Please specify a <msg_id> and optionally a recipient.')
             return 0
 
         msg_id = arguments.pop(0)
@@ -254,13 +239,12 @@ def command_line(argv):
         else:
             recipient = None
 
-
         if mode == 'poll':
             poll_report_text(server, msg_id, recipient)
 
         report = server.get_report(msg_id, recipient)
 
         for triple in report:
-            print format_status_report(triple)
+            print(format_status_report(triple))
 
-        print
+        print()

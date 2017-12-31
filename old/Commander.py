@@ -9,7 +9,6 @@ import curses, curses.textpad
 import BulkSMS, BulkSMS.PhoneBook
 
 
-
 def real_interactive(screen):
 	'''
 	Act as an interactive curses application. This is called from
@@ -30,13 +29,11 @@ def real_interactive(screen):
 	return res
 
 
-
 class Keys:
 	def findkey(self, key):
 		for name, value in vars(self).iteritems():
 			if value == key:
 				return name
-
 
 	this = locals()
 
@@ -58,10 +55,7 @@ class Keys:
 
 	del this
 
-
 keys = Keys()
-
-
 
 class LineInput(object):
 	'''

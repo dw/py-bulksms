@@ -1,6 +1,6 @@
-'''
+"""
 BulkSMS/CoreBulkSMS.py: Core BulkSMS package functionality.
-'''
+"""
 
 __author__ = 'David Wilson'
 
@@ -13,25 +13,22 @@ __all__ = [
     'format_credits', 'Server'
 ]
 
-import urllib, urllib2, time, PhoneBook, datetime
-
-
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, time, datetime
+from . import PhoneBook 
 
 
 class BulkSMSException(Exception):
-    '''
+    """
     Exception. Base class for all BulkSMS.co.uk exceptions.
-    '''
+    """
 
     pass
 
 
-
-
 class MessageLengthException(BulkSMSException):
-    '''
+    """
     Exception. Raised when an SMS message is too long to transmit.
-    '''
+    """
 
     def __init__(self, len, max):
         self.len = len
@@ -43,12 +40,10 @@ class MessageLengthException(BulkSMSException):
             ( self.max, self.len )
 
 
-
-
 class AuthenticationException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk refuse our (<username>, <password>).
-    '''
+    """
 
     def __init__(self, description):
         self.status_code = 23
@@ -58,13 +53,11 @@ class AuthenticationException(BulkSMSException):
         return 'Authentication failure: %s' % self.status_description
 
 
-
-
 class DataValidationException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk indicate our supplied values were
     incorrect.
-    '''
+    """
 
     def __init__(self, description):
         self.status_code = 24
@@ -74,13 +67,11 @@ class DataValidationException(BulkSMSException):
         return 'Data validation failed: %s' % self.status_description
 
 
-
-
 class InsufficientCreditsException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk indicate we do not have enough credits
     to send a message.
-    '''
+    """
 
     def __init__(self, code, description):
         self.status_code = 24
@@ -90,13 +81,11 @@ class InsufficientCreditsException(BulkSMSException):
         return 'Insufficient credit: %s' % self.status_description
 
 
-
-
 class DuplicateMessageException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk indicate that this message is a
     duplicate and nodup is enabled.
-    '''
+    """
 
     def __init__(self):
         self.status_code = 50
@@ -105,13 +94,11 @@ class DuplicateMessageException(BulkSMSException):
         return 'Duplicate message detected.'
 
 
-
-
 class QuotaException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk indicate we have reached our
     transmission quota.
-    '''
+    """
 
     def __init__(self, code, description):
         self.status_code = code
@@ -121,12 +108,10 @@ class QuotaException(BulkSMSException):
         return 'Transmission quota reached: %s' % self.status_description
 
 
-
-
 class MessageNotFoundException(BulkSMSException):
-    '''
+    """
     Exception. Raised when BulkSMS.co.uk cannot find a msg_id we have requested.
-    '''
+    """
 
     def __init__(self):
         self.status_code = 1001
@@ -135,12 +120,10 @@ class MessageNotFoundException(BulkSMSException):
         return 'Message not found.'
 
 
-
-
 class InternalFatalError(BulkSMSException):
-    '''
+    """
     Exception. Raised when an internal fatal error occurs at BulkSMS.co.uk.
-    '''
+    """
 
     def __init__(self):
         self.status_code = 22
@@ -149,13 +132,11 @@ class InternalFatalError(BulkSMSException):
         return 'Internal fatal error.'
 
 
-
-
 class UnknownException(BulkSMSException):
-    '''
+    """
     Exception. Raised when an unknown status message is returned by
     BulkSMS.co.uk.
-    '''
+    """
 
     def __init__(self, status_code, status_description = None):
         self.status_code = int(status_code)
@@ -169,12 +150,10 @@ class UnknownException(BulkSMSException):
             ( self.status_code, self.status_description )
 
 
-
-
 class CommunicationException(BulkSMSException):
-    '''
+    """
     Exception. Raised when we could not talk to BulkSMS.co.uk.
-    '''
+    """
 
     def __init__(self, reason):
         self.reason = reason
@@ -183,28 +162,25 @@ class CommunicationException(BulkSMSException):
         return str(self.reason)
 
 
-
 def format_credits(credits):
-    '''
+    """
     Return a string representation of the floating point number <credits>
     formatted as BulkSMS.co.uk format their floats.
-    '''
+    """
 
     return '%3.2f' % credits
 
 
-
-
 class InboxMessage:
-    '''
+    """
     This class represents a single inbox message.
-    '''
+    """
 
     def from_response(cls, response):
-        '''
+        """
         Instanciate a new InboxMessage instance from a single BulkSMS response
         line as returned by the get_inbox EAPI call.
-        '''
+        """
 
         parts = response.split('|')
         self = cls()
@@ -219,14 +195,14 @@ class InboxMessage:
             self.message = parts[2]
             self.msisdn = parts[4]
             self.referring_msg_id = int(parts[5])
-        except ValueError, e:
+        except ValueError as e:
             raise CommunicationException(\
                 'One or more fields from a get_inbox response were invalid.')
 
         try:
             ts = time.mktime(time.strptime(parts[3], '%Y-%m-%d %H:%M:%S'))
             self.received_time = datetime.datetime.fromtimestamp(ts)
-        except ValueError, e:
+        except ValueError as e:
             raise CommunicationException(\
                 'A get_inbox response contained an incorrect received_time.')
 
@@ -235,10 +211,8 @@ class InboxMessage:
     from_response = classmethod(from_response)
 
 
-
-
 class Server:
-    '''
+    """
     Main SMS server communication class. Allows transmission of one or multiple
     messages, and confirmation of delivery.
 
@@ -278,36 +252,33 @@ class Server:
 
     <repliable> indicates that this SMS should initiate a 2-way SMS if at
     all possible.
-    '''
+    """
 
     _server = 'www.bulksms.co.uk'  # Default
     _max_lengths = { '7bit': 160, '8bit': 280, '16bit': 280 }
     _bare_request = ( 'username', 'password' )
 
     _valid_options = [
-        ( 'sender', str ),         ( 'msg_class', int ),
-        ( 'dca', str ),            ( 'want_report', bool ),
-        ( 'cost_route', int ),     ( 'nodup', bool ),
-        ( 'transient_wait', int ), ( 'transient_retries', int ),
-        ( 'poll_time', int ),      ( 'poll_wait', int ),
-        ( 'phonebook', PhoneBook.BasePhoneBook ),
-        ( 'secure_repr', bool ),   ( 'repliable', int )
+        ('sender', str),         ('msg_class', int),
+        ('dca', str),            ('want_report', bool),
+        ('cost_route', int),     ('nodup', bool),
+        ('transient_wait', int), ('transient_retries', int),
+        ('poll_time', int),      ('poll_wait', int),
+        ('phonebook', PhoneBook.BasePhoneBook),
+        ('secure_repr', bool),   ('repliable', int)
     ]
 
     _ports_paths = {
-        'send_sms':         ( 5567, '/eapi/submission/send_sms/1/1.1' ),
-        'quote_sms':        ( 7512, '/eapi/1.0/quote_sms.mc' ),
-        'get_report':       ( 7512, '/eapi/1.0/get_report.mc' ),
-        'get_credits':      ( 7512, '/eapi/1.0/get_credits.mc' ),
-        'get_inbox':        ( 5567, '/eapi/reception/get_inbox/1/1.0' )
+        'send_sms':         (80, '/eapi/submission/send_sms/2/2.0'),
+        'quote_sms':        (7512, '/eapi/1.0/quote_sms.mc'),
+        'get_report':       (80, '/eapi/status_reports/get_report/2/2.0'),
+        'get_credits':      (80, '/eapi/user/get_credits/1/1.1'),
+        'get_inbox':        (5567, '/eapi/reception/get_inbox/1/1.0')
     }
-
-
-
 
     def __init__(self, username, password, address=None, **kwargs):
         if type(username) != str or type(password) != str:
-            raise ValueError, 'username and password must be strings.'
+            raise ValueError('username and password must be strings.')
 
         if address is not None:
             self._server = address
@@ -331,11 +302,8 @@ class Server:
 
             self_dict[option] = value
 
-
-
-
     def send_sms(self, recipients, message, **options):
-        '''
+        """
         Send a message to multiple recipients.
 
         <recipients> is a list of telephone numbers to transmit the message to,
@@ -344,7 +312,7 @@ class Server:
 
         <message> is the text message in the character set specified by <dca>.
         Other optional fields are described in the class documentation.
-        '''
+        """
 
         self._phonebook_expand(recipients)
 
@@ -362,15 +330,12 @@ class Server:
 
         return int(msg_id)
 
-
-
-
     def quote_sms(self, recipients, message, **options):
-        '''
+        """
         Return a floating point number indicating the number of credits that
         would be used to send a message. All parameters are, and should be
         identical to those used in send_sms.
-        '''
+        """
 
         self._phonebook_expand(recipients)
 
@@ -387,15 +352,12 @@ class Server:
         self._raise_status(code, desc)
 
         return float(return_value)
-
-
-
-
+    
     def get_credits(self, **options):
-        '''
+        """
         Return a floating point number indicating the amount of credit
         remaining on this BulkSMS.co.uk account.
-        '''
+        """
 
         data = {}
 
@@ -404,17 +366,14 @@ class Server:
         code, desc, return_value = self._parse_status(lines)
         self._raise_status(code, desc)
 
-        return float(return_value)
-
-
-
+        return float(desc)
 
     def get_report(self, msg_id, recipient = None, **options):
-        '''
+        """
         Returns a list of (<recipient>, <status_code>, <description>) triples
         for the given <msg_id>. If <recipient> is specified, return a list of
         one triple for the given recipient.
-        '''
+        """
 
         recipient = self._phonebook_expand_string(recipient)
 
@@ -435,13 +394,10 @@ class Server:
             parts = line.split('|')
             triples.append((parts[0], int(parts[1]), parts[2]))
 
-
         return triples
 
-
-
     def poll_report(self, msg_id, report_fn, recipient = None, **options):
-        '''
+        """
         Periodically ask BulkSMS for a delivery report for the given
         <msg_id>. If <recipient> is given, then only ask for the status
         of that recipient.
@@ -449,7 +405,7 @@ class Server:
         When the status changes, hand <report_fn> the list returned by
         get_report(). All arguments, with the exception of <report_fn>,
         are identical to get_report().
-        '''
+        """
 
         poll_time = self.poll_time or (5 * 60)
         poll_wait = self.poll_wait or 10
@@ -475,14 +431,11 @@ class Server:
             poll_time -= poll_wait
             time.sleep(poll_wait)
 
-
-
-
     def get_inbox(self, last_retrieved_id = 0, **options):
-        '''
+        """
         Return a list of InboxMessage instances, corresponding to each message
         in this BulkSMS account's inbox, starting at <last_retrieved_id>.
-        '''
+        """
 
         data = {
             'last_retrieved_id': last_retrieved_id
@@ -495,14 +448,14 @@ class Server:
 
         return [ InboxMessage.from_response(line) for line in lines if line ]
 
-
-
-
     def _test_message_length(self, message, options):
-        '''
+        """
         Check the given messages do not exceed the given limits for their data
         coding alphabet.
-        '''
+        """
+
+        if 'allow_concat_text_sms' in options and options['allow_concat_text_sms'] > 0:
+            return
 
         dca = options.get('dca', '7bit')
         length = len(message)
@@ -510,17 +463,13 @@ class Server:
         if length <= self._max_lengths[dca]:
             return
 
-
         raise MessageLengthException(length, self._max_lengths[dca])
 
-
-
-
     def _parse_status(self, lines):
-        '''
+        """
         Remove the status line from <lines>, and return a
         (<code>, <description>, <return_value>)
-        '''
+        """
 
         code = None
         description = None
@@ -541,15 +490,12 @@ class Server:
 
         return code, description, return_value
 
-
-
-
     def _raise_status(self, code, description):
-        '''
+        """
         Raise an error if the <code> indicates failure.
-        '''
+        """
 
-        ok_codes = ( None, 0, 10, 11, 12, )
+        ok_codes = ( None, 0, 1, 10, 11, 12, )
 
         if code in ok_codes:
             return
@@ -572,24 +518,21 @@ class Server:
         elif code != 1000:
             raise UnknownException(code, description)
 
-
-
-
     def _apply_options(self, data_dict, user_options, applicable = None):
-        '''
+        """
         Update <data_dict> to include the options from <options>, and any
         configured for this class instance.
-        '''
+        """
 
         applicable_options = (
             'username', 'password', 'sender', 'msg_class',
             'dca', 'want_report', 'cost_route', 'nodup',
-            'repliable'
+            'repliable', 'allow_concat_text_sms', 'concat_text_sms_max_parts',
+            'send_time', 'stop_dup_id', 'test_always_succeed', 'test_always_fail'
         )
 
         if applicable is not None:
             applicable_options = applicable
-
 
         for option in applicable_options:
             if option in user_options and user_options[option] != None:
@@ -600,13 +543,10 @@ class Server:
         if 'msg_id' in user_options:
             data_dict['msg_id'] = str(user_options['msg_id'])
 
-
-
-
     def _convert(self, value):
-        '''
+        """
         Convert basic Python types into a format understood by BulkSMS.
-        '''
+        """
 
         if type(value) is bool:
             if value:
@@ -614,10 +554,10 @@ class Server:
             else:
                 return '0'
 
+        if isinstance(value, datetime.datetime):
+            return value.strftime("%Y-%m-%d %H:%M:%S")
+
         return str(value)
-
-
-
 
     def __repr__(self):
         if self.secure_repr:
@@ -639,9 +579,6 @@ class Server:
         return 'BulkSMS.Server(%r, %r%s)' % \
             ( self.username, self.password, used_opts_str)
 
-
-
-
     def _phonebook_expand(self, list):
         if self.phonebook == None:
             return
@@ -654,9 +591,6 @@ class Server:
                 list[keyword_idx] = result.pop(0)
                 list.extend(result)
 
-
-
-
     def _phonebook_expand_string(self, string):
         if not self.phonebook or string is None:
             return string
@@ -664,60 +598,50 @@ class Server:
         result = self.phonebook.lookup_keyword(string)
         return result or string
 
-
-
-
     def _http_single(self, url, data):
-        '''
+        """
         Make a single (non-retryable) HTTP request.
-        '''
+        """
 
         try:
-            return urllib2.urlopen(url, data)
+            return urllib.request.urlopen(url, data.encode())
 
-        except urllib2.HTTPError, error:
+        except urllib.error.HTTPError as error:
             raise CommunicationException('HTTP server: %s' % error)
 
-        except urllib2.URLError, error:
+        except urllib.error.URLError as error:
             raise CommunicationException(str(error.reason[1]))
 
-
-
-
     def _http_retry(url, data, wait, retries):
-        '''
+        """
         Attempt to request an HTTP url multiple times.
-        '''
+        """
 
         while retries:
             retries -= 1
 
             try:
-                return urllib2.urlopen(url, data)
+                return urllib.request.urlopen(url, data.encode())
 
-            except urllib2.HTTPError, error:
+            except urllib.error.HTTPError as error:
                 time.sleep(wait)
                 continue
 
-            except urllib2.URLError, error:
+            except urllib.error.URLError as error:
                 raise CommunicationException(str(error.reason))
 
-
-
-
     def _http_request(self, request, data, options):
-        '''
+        """
         Make an HTTP request to BulkSMS.co.uk.
-        '''
+        """
 
         port, path = self._ports_paths[request]
 
         wait = options.get('transient_wait', self.transient_wait)
         retries = options.get('transient_retries', self.transient_retries)
-        data_encoded = urllib.urlencode(data)
+        data_encoded = urllib.parse.urlencode(data)
 
         url = 'http://%s:%d%s' % ( self._server, port, path )
-
 
         if wait is None or retries is None:
             response = self._http_single(url, data_encoded)
@@ -725,5 +649,4 @@ class Server:
         else:
             response = self._http_retry(url, data_encoded, wait, retries)
 
-
-        return response.read().split('\n')
+        return response.read().decode(response.headers.get_content_charset('utf-8')).split('\n')
